@@ -7,15 +7,14 @@
 
 ## tableTools.tableCalculator.js
 
-  #### A tool to calculate fields in row. 
-   #### Idea is:
+  #### A tool to compute table (sequence of rows) or row with calculated fields and nested calculated fields in functional way.
+   ##### Concepts:
   - Some fields set by user, some are calculated.  
   - Calculated fields in row can only depend on fields of their row.  
   - Calculated fields are same in whole table.  
   - If user set value to calculated field - user input is ignored, field value overrides by calculation.  
   - The result is concentraiton of set by user fields and calculated fields.  
-  #### Notes:
-  - Table processing realized by interator protocol.  
-  - Calculation of fields subset realized by lazy equations.
+  - Traverse through table by iterator protocol.
 
+[JSFiddle example (all output in console)](http://jsfiddle.net/vcxz09876/kLmkuzb7/)
 
