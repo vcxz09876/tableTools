@@ -35,7 +35,7 @@ HOTUtils.objectToSetRowArray = function(n, obj) {
   return res;
 }
 
-HOTUtils.reCalculate = function(data, rowUpdate) {
+HOTUtils.reCalculateData = function(data, rowUpdate) {
   for (k in data) {
     data[k] = rowUpdate(0, data[k]);
   };
@@ -74,10 +74,14 @@ HOTUtils.HOTAbstract = function(target) {
   // Config extentions by user.
   this.extendHOTConfig = {};
 
-	// Function that recalculate row on change.
+  // Function that recalculate row on change.
   // Return row {'fieldname1': value1, 'fieldname2': value2, ... : ...}
   this.rowUpdate = function(n, row) {
     return row;
+  }
+
+  this.afterAllChanges = function() {
+    return true;
   }
 
   //Simplify render initilization.
@@ -88,9 +92,10 @@ HOTUtils.HOTAbstract = function(target) {
     return hot;
   }
 
-	// Function renders HOT table in this.target element
+  // Function renders HOT table in this.target element
   this.render = function(overrideConfig) {
-    var rowUpdate = this.rowUpdate;
+    var rowUpdate = this.rowUpdate,
+      afterAllChanges = this.afterAllChanges;
 
     if (overrideConfig === undefined) {
       overrideConfig = {};
@@ -99,26 +104,33 @@ HOTUtils.HOTAbstract = function(target) {
     // Configs mergeing
     var config = HOTUtils.mergeObjects({}, [this.defaultHOTConfig, this.extendHOTConfig, overrideConfig]);
 
-    HOTUtils.reCalculate(config.data, rowUpdate);
+    HOTUtils.reCalculateData(config.data, rowUpdate);
 
     // Rendering table
     var hot = this.makeRender(this.target, config, '');
 
     // Function that is called on cell change.
-    function onCellChange() {
-      var old_value = arguments[0][0][2], // get values form argumets, that pass HOT, when call onCellChange function
-        new_value = arguments[0][0][3];
+    function onCellChange(changes) {
+      var oldFirstChangedCellValue = changes[0][2],
+        newFirstChangedCellValue = changes[0][3],
+        rowsToUpdate = [];
 
-      // Check value change to avoid infinite updates.
+      // Check first cell value change to avoid infinite updates.
       // Additional check if all parameters is NaN to avoid infinit loop with NaN NaN comparison, but can be buggy on not number values.
-      if (old_value == new_value || (isNaN(old_value) && isNaN(new_value))) {
+      if (oldFirstChangedCellValue == newFirstChangedCellValue ||
+        (isNaN(oldFirstChangedCellValue) && isNaN(newFirstChangedCellValue))) {
         return true;
       };
-      var row_n = arguments[0][0][0], // get row number from arguments
-        row = hot.getSourceDataAtRow(row_n);
 
-      // Recalculate row values by calling rowUpdate function and set this values to HOT table.
-      hot.setDataAtRowProp(HOTUtils.objectToSetRowArray(row_n, rowUpdate(row_n, row)));
+      // Collect all recalculated rows
+      for (i in changes) {
+        var row_n = changes[i][0],
+          row = hot.getSourceDataAtRow(row_n),
+          newRow = HOTUtils.objectToSetRowArray(row_n, rowUpdate(row_n, row));
+        rowsToUpdate = rowsToUpdate.concat(newRow);
+      }
+      hot.setDataAtRowProp(rowsToUpdate);
+      afterAllChanges()
     }
 
     // Register hook on HOT, that calls onCellChange function on every cell change.
