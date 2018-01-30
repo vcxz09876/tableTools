@@ -165,7 +165,7 @@ tableCalculator.makeTableCalculationIterator = function() {
 
 /*
  #########################################################################################################
- IMPERATIVE STYLE FUNCTIONS:
+ SINGLE ROW CALCULATION:
  #########################################################################################################
 */
 
@@ -180,6 +180,63 @@ tableCalculator.makeRowCalculation = function(calculatedFields) {
     };
     return result;
 
+  };
+}
+
+/*
+ #########################################################################################################
+ LIANER INTERPOLATION:
+ #########################################################################################################
+*/
+
+tableCalculator.Point2D = function(x, y) {
+  this.x = x;
+  this.y = y;
+}
+
+
+tableCalculator.interpLianer = function (p1, p2) {
+  return function(x) {
+    /*
+    line function:
+    y = k*x + b
+    k = (y2 - y1) / (x2 - x1)
+    b = y1 - k * x1
+    */
+    var k = (p2.y - p1.y) / (p2.x - p1.x),
+      b = p1.y - k * p1.x;
+
+    return new tableCalculator.Point2D(x, k * x + b);
+  };
+}
+
+tableCalculator.interpOnPline = function(plist) {
+    /*
+    Find point on polyline.
+    Polyline - array of point (Point2D)
+    */
+  return function(x) {
+    var lastPoint = undefined,
+      point = undefined;
+
+    for (i in plist) {
+      point = plist[i];
+
+      if (x < point.x && (lastPoint === undefined)) {
+        return undefined;
+      }
+
+      if (lastPoint === undefined) {
+        lastPoint = point;
+        continue;
+      }
+
+      if (lastPoint.x <= x && x <= point.x) {
+        return tableCalculator.interpLianer(lastPoint, point)(x);
+      }
+      lastPoint = point;
+    }
+    return undefined;
   };
 }
 
