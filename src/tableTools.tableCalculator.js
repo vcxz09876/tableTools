@@ -1,6 +1,4 @@
 /*
-To embed: https://jsfiddle.net/vcxz09876/5dbwztd4/show_js/
-
 Example: https://jsfiddle.net/vcxz09876/kLmkuzb7/
 
 ##########################################################################################################
