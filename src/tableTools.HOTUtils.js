@@ -117,8 +117,7 @@ HOTUtils.HOTAbstract = function(target) {
 
       // Check first cell value change to avoid infinite updates.
       // Additional check if all parameters is NaN to avoid infinit loop with NaN NaN comparison, but can be buggy on not number values.
-      if (oldFirstChangedCellValue == newFirstChangedCellValue ||
-        (isNaN(oldFirstChangedCellValue) && isNaN(newFirstChangedCellValue))) {
+      if (oldFirstChangedCellValue == newFirstChangedCellValue) {
         return true;
       };
 
