@@ -80,7 +80,7 @@ HOTUtils.HOTAbstract = function(target) {
     return row;
   }
 
-  this.afterAllChanges = function() {
+  this.afterAllChanges = function() { // Must be set before calling render()
     return true;
   }
 
