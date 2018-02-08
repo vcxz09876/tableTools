@@ -1,12 +1,9 @@
 /*
-
 https://jsfiddle.net/vcxz09876/01h2sp1a/show_js/
 ##########################################################################################################
   IDEA:
 ##########################################################################################################
-
 Simplify usage of Handsontable (https://handsontable.com/) by making some shortcuts and preconfigurations.
-
 Basicly, I intend to use it in my own projects. Just, want to store simplifications in one place.
 */
 
@@ -47,22 +44,16 @@ HOTUtils.reCalculateData = function(data, rowUpdate) {
 ##########################################################################################################
   HOTUtils.HOT*
 ##########################################################################################################
-
 ### Idea
-
 Make some preconfigured base classes to simplify usage.
 Provide ability to use custom row calculators.
-
 ### What they do:
-
 Merge all configurations:
                          defaultHOTConfig - set in HOTUtils abstract classes,
                          extendHOTConfig - set in user defined subclass,
                          overrideConfig - set as render argument.
-
 Implement row recalculatioin by call row = rowUpdate(n, row) function on startup and cell change.
 *row - structure {'fieldname1': value1, 'fieldname2': value2, ... : ...}
-
 */
 
 //Topmost class with most basic configurations and functional
@@ -124,7 +115,7 @@ HOTUtils.HOTAbstract = function(target) {
       // Collect all recalculated rows
       for (i in changes) {
         var row_n = changes[i][0],
-          row = hot.getSourceDataAtRow(row_n),
+          row = hot.getSourceDataAtRow(hot.toPhysicalRow(row_n)),
           newRow = HOTUtils.objectToSetRowArray(row_n, rowUpdate(row_n, row));
         rowsToUpdate = rowsToUpdate.concat(newRow);
       }
