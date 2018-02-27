@@ -83,7 +83,7 @@ HOTUtils.HOTAbstract = function(target) {
 
   // Function renders HOT table in this.target element
   this.render = function(overrideConfig) {
-    var fixedThis = this;
+    var fixedThis = this; // anchored this, becouse HOT pass self as this when apply onCellChange
 
     if (overrideConfig === undefined) {
       overrideConfig = {};
