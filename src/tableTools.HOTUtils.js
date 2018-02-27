@@ -71,9 +71,7 @@ HOTUtils.HOTAbstract = function(target) {
     return row;
   }
 
-  this.afterAllChanges = function() { // Must be set before calling render()
-    return true;
-  }
+  this.afterAllChanges = new Array();
 
   //Simplify render initilization.
   this.makeRender = function renderHOT(target, config, rowCalculator) {
@@ -85,8 +83,7 @@ HOTUtils.HOTAbstract = function(target) {
 
   // Function renders HOT table in this.target element
   this.render = function(overrideConfig) {
-    var rowUpdate = this.rowUpdate,
-      afterAllChanges = this.afterAllChanges;
+    var fixedThis = this;
 
     if (overrideConfig === undefined) {
       overrideConfig = {};
@@ -95,7 +92,7 @@ HOTUtils.HOTAbstract = function(target) {
     // Configs mergeing
     var config = HOTUtils.mergeObjects({}, [this.defaultHOTConfig, this.extendHOTConfig, overrideConfig]);
 
-    HOTUtils.reCalculateData(config.data, rowUpdate);
+    HOTUtils.reCalculateData(config.data, fixedThis.rowUpdate);
 
     // Rendering table
     var hot = this.makeRender(this.target, config, '');
@@ -116,11 +113,14 @@ HOTUtils.HOTAbstract = function(target) {
       for (i in changes) {
         var row_n = changes[i][0],
           row = hot.getSourceDataAtRow(hot.toPhysicalRow(row_n)),
-          newRow = HOTUtils.objectToSetRowArray(row_n, rowUpdate(row_n, row));
+          newRow = HOTUtils.objectToSetRowArray(row_n, fixedThis.rowUpdate(row_n, row));
         rowsToUpdate = rowsToUpdate.concat(newRow);
       }
       hot.setDataAtRowProp(rowsToUpdate);
-      afterAllChanges()
+
+      fixedThis.afterAllChanges.map(function(i) {
+        i(); // Call every afterAllChanges fucntion
+      });
     }
 
     // Register hook on HOT, that calls onCellChange function on every cell change.
