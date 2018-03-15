@@ -65,6 +65,18 @@ HOTUtils.HOTAbstract = function(target) {
   // Config extentions by user.
   this.extendHOTConfig = {};
 
+  this.setData = function(data) {
+    if (this.hot === undefined) {
+      return false;
+    }
+    HOTUtils.reCalculateData(data, this.rowUpdate);
+    this.hot.loadData(data);
+  };
+
+  this.getData = function() {
+    return this.hot.getData();
+  }
+
   // Function that recalculate row on change.
   // Return row {'fieldname1': value1, 'fieldname2': value2, ... : ...}
   this.rowUpdate = function(n, row) {
@@ -83,7 +95,7 @@ HOTUtils.HOTAbstract = function(target) {
 
   // Function renders HOT table in this.target element
   this.render = function(overrideConfig) {
-    var fixedThis = this; // anchored this, becouse HOT pass self as this when apply onCellChange
+    var fixedThis = this; // anchored 'this', becouse HOT pass self as this when apply onCellChange
 
     if (overrideConfig === undefined) {
       overrideConfig = {};
@@ -96,9 +108,16 @@ HOTUtils.HOTAbstract = function(target) {
 
     // Rendering table
     var hot = this.makeRender(this.target, config, '');
+    fixedThis.hot = hot; // Store hot in parent
 
     // Function that is called on cell change.
     function onCellChange(changes) {
+
+      // To work correctly with loadData
+      if (changes === null) {
+        return false;
+      }
+
       var oldFirstChangedCellValue = changes[0][2],
         newFirstChangedCellValue = changes[0][3],
         rowsToUpdate = [];
@@ -129,6 +148,14 @@ HOTUtils.HOTAbstract = function(target) {
     // Return HOT table instance.
     return hot;
 
+  };
+
+  this.close = function() {
+  	if (this.hot == undefined){return false;}
+
+    this.hot.destroy();
+    this.hot = undefined;
+    return true;
   };
 
 }
