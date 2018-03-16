@@ -1,7 +1,7 @@
 /*
 https://jsfiddle.net/vcxz09876/01h2sp1a/show_js/
 ##########################################################################################################
-  IDEA:
+IDEA:
 ##########################################################################################################
 Simplify usage of Handsontable (https://handsontable.com/) by making some shortcuts and preconfigurations.
 Basicly, I intend to use it in my own projects. Just, want to store simplifications in one place.
@@ -42,16 +42,16 @@ HOTUtils.reCalculateData = function(data, rowUpdate) {
 
 /*
 ##########################################################################################################
-  HOTUtils.HOT*
+HOTUtils.HOT*
 ##########################################################################################################
 ### Idea
 Make some preconfigured base classes to simplify usage.
 Provide ability to use custom row calculators.
 ### What they do:
 Merge all configurations:
-                         defaultHOTConfig - set in HOTUtils abstract classes,
-                         extendHOTConfig - set in user defined subclass,
-                         overrideConfig - set as render argument.
+defaultHOTConfig - set in HOTUtils abstract classes,
+extendHOTConfig - set in user defined subclass,
+overrideConfig - set as render argument.
 Implement row recalculatioin by call row = rowUpdate(n, row) function on startup and cell change.
 *row - structure {'fieldname1': value1, 'fieldname2': value2, ... : ...}
 */
@@ -88,8 +88,8 @@ HOTUtils.HOTAbstract = function(target) {
   //Simplify render initilization.
   this.makeRender = function renderHOT(target, config, rowCalculator) {
     var
-      container = document.getElementById(target),
-      hot = new Handsontable(container, config);
+    container = document.getElementById(target),
+    hot = new Handsontable(container, config);
     return hot;
   }
 
@@ -119,8 +119,8 @@ HOTUtils.HOTAbstract = function(target) {
       }
 
       var oldFirstChangedCellValue = changes[0][2],
-        newFirstChangedCellValue = changes[0][3],
-        rowsToUpdate = [];
+      newFirstChangedCellValue = changes[0][3],
+      rowsToUpdate = [];
 
       // Check first cell value change to avoid infinite updates.
       // Additional check if all parameters is NaN to avoid infinit loop with NaN NaN comparison, but can be buggy on not number values.
@@ -131,8 +131,8 @@ HOTUtils.HOTAbstract = function(target) {
       // Collect all recalculated rows
       for (i in changes) {
         var row_n = changes[i][0],
-          row = hot.getSourceDataAtRow(hot.toPhysicalRow(row_n)),
-          newRow = HOTUtils.objectToSetRowArray(row_n, fixedThis.rowUpdate(row_n, row));
+        row = hot.getSourceDataAtRow(hot.toPhysicalRow(row_n)),
+        newRow = HOTUtils.objectToSetRowArray(row_n, fixedThis.rowUpdate(row_n, row));
         rowsToUpdate = rowsToUpdate.concat(newRow);
       }
       hot.setDataAtRowProp(rowsToUpdate);
@@ -150,15 +150,22 @@ HOTUtils.HOTAbstract = function(target) {
 
   };
 
+  this.display = function(target, data, overrideConfig){
+    this.target = target;
+    if (overrideConfig === undefined) {overrideConfig = {};}
+    if (data === undefined) {data = [];}
+
+    return this.render(HOTUtils.mergeObjects({}, [{'data':data}, overrideConfig]););
+  };
+
   this.close = function() {
-  	if (this.hot == undefined){return false;}
+    if (this.hot == undefined){return false;}
 
     this.hot.destroy();
     this.hot = undefined;
     return true;
   };
-
-}
+};
 
 // Editable table preconfiguration.
 HOTUtils.HOTEditor = function(target) {
