@@ -155,7 +155,7 @@ HOTUtils.HOTAbstract = function(target) {
     if (overrideConfig === undefined) {overrideConfig = {};}
     if (data === undefined) {data = [];}
 
-    return this.render(HOTUtils.mergeObjects({}, [{'data':data}, overrideConfig]););
+    return this.render(HOTUtils.mergeObjects({}, [{data:data}, overrideConfig]));
   };
 
   this.close = function() {
