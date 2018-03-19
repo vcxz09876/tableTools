@@ -151,11 +151,14 @@ HOTUtils.HOTAbstract = function(target) {
   };
 
   this.display = function(target, data, overrideConfig){
+    this.close();
+
     this.target = target;
     if (overrideConfig === undefined) {overrideConfig = {};}
     if (data === undefined) {data = [];}
 
-    return this.render(HOTUtils.mergeObjects({}, [{data:data}, overrideConfig]));
+    this.render(HOTUtils.mergeObjects({}, [{data:data}, overrideConfig]));
+    return this;
   };
 
   this.close = function() {
